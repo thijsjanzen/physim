@@ -5,3 +5,7 @@ sim_ddd_cpp <- function(la, mu, K, max_t, num_species, seed = -1L) {
     .Call(`_physim_sim_ddd_cpp`, la, mu, K, max_t, num_species, seed)
 }
 
+sim_pbd_cpp <- function(la0, mu0, la1, mu1, trans_rate, max_t, num_species, seed = -1L) {
+    .Call(`_physim_sim_pbd_cpp`, la0, mu0, la1, mu1, trans_rate, max_t, num_species, seed)
+}
+

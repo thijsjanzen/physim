@@ -26,9 +26,28 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// sim_pbd_cpp
+Rcpp::List sim_pbd_cpp(double la0, double mu0, double la1, double mu1, double trans_rate, double max_t, double num_species, int seed);
+RcppExport SEXP _physim_sim_pbd_cpp(SEXP la0SEXP, SEXP mu0SEXP, SEXP la1SEXP, SEXP mu1SEXP, SEXP trans_rateSEXP, SEXP max_tSEXP, SEXP num_speciesSEXP, SEXP seedSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< double >::type la0(la0SEXP);
+    Rcpp::traits::input_parameter< double >::type mu0(mu0SEXP);
+    Rcpp::traits::input_parameter< double >::type la1(la1SEXP);
+    Rcpp::traits::input_parameter< double >::type mu1(mu1SEXP);
+    Rcpp::traits::input_parameter< double >::type trans_rate(trans_rateSEXP);
+    Rcpp::traits::input_parameter< double >::type max_t(max_tSEXP);
+    Rcpp::traits::input_parameter< double >::type num_species(num_speciesSEXP);
+    Rcpp::traits::input_parameter< int >::type seed(seedSEXP);
+    rcpp_result_gen = Rcpp::wrap(sim_pbd_cpp(la0, mu0, la1, mu1, trans_rate, max_t, num_species, seed));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_physim_sim_ddd_cpp", (DL_FUNC) &_physim_sim_ddd_cpp, 6},
+    {"_physim_sim_pbd_cpp", (DL_FUNC) &_physim_sim_pbd_cpp, 8},
     {NULL, NULL, 0}
 };
 

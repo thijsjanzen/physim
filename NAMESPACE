@@ -2,5 +2,6 @@
 
 export(dd_sim_R)
 export(sim_ddd)
+export(sim_pbd)
 import(Rcpp)
 useDynLib(physim, .registration = TRUE)

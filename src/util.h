@@ -1,0 +1,17 @@
+#pragma once
+
+#include <Rcpp.h>
+#include <vector>
+#include <array>
+
+inline void vector_to_numericmatrix(const std::vector< std::array< float, 4 >>& v,
+                             Rcpp::NumericMatrix* m) {
+  int n_rows = v.size();
+  (*m) = Rcpp::NumericMatrix(n_rows, 4);
+  for (int i = 0; i < n_rows; ++i) {
+    for (int j = 0; j < 4; ++j) {
+      (*m)(i, j) = v[i][j];
+    }
+  }
+  return;
+}

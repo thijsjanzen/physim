@@ -1,17 +1,6 @@
 #include <Rcpp.h>
 #include "sim_dd.h"
-
-void vector_to_numericmatrix(const std::vector< std::array< float, 4 >>& v,
-                             Rcpp::NumericMatrix* m) {
-  int n_rows = v.size();
-  (*m) = Rcpp::NumericMatrix(n_rows, 4);
-  for (int i = 0; i < n_rows; ++i) {
-    for (int j = 0; j < 4; ++j) {
-      (*m)(i, j) = v[i][j];
-    }
-  }
-  return;
-}
+#include "util.h"
 
 // [[Rcpp::export]]
 Rcpp::List sim_ddd_cpp(double la,
