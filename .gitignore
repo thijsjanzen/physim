@@ -1,0 +1,4 @@
+
+*.so
+*.o
+.Rproj.user/shared/notebooks/patch-chunk-names
