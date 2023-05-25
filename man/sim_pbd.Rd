@@ -13,7 +13,7 @@ sim_pbd(
   completion_rate,
   max_t = -1,
   num_species = -1,
-  return_fossils = FALSE,
+  max_tries = 1e+06,
   seed = -1
 )
 }
