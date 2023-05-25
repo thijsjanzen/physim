@@ -8,10 +8,11 @@ Rcpp::List sim_ddd_cpp(double la,
                             double K,
              double max_t,
              double num_species,
-             int seed = -1) {
+             int seed = -1,
+             int max_tries = 1e6) {
 
   dd_sim sim(la, mu, K, max_t, num_species, seed);
-  while (true) {
+  for (size_t cnt = 0; cnt < max_tries; ++cnt) {
     sim.run();
     if (sim.run_info != extinct) {
       auto sim_num_spec = sim.get_num_species();
@@ -25,7 +26,7 @@ Rcpp::List sim_ddd_cpp(double la,
     }
   }
   Rcpp::NumericMatrix ltable_for_r;
-  vector_to_numericmatrix(sim.L, &ltable_for_r);
+  vector_to_numericmatrix(sim.L, ltable_for_r);
   return Rcpp::List::create(Rcpp::Named("ltable") = ltable_for_r,
                             Rcpp::Named("crown_age") = sim.t);
 }

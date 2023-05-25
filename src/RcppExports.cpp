@@ -10,9 +10,25 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
+// bisse_sim_cpp
+Rcpp::List bisse_sim_cpp(const std::vector<float>& pars, float crown_age, int num_species, float init_state, bool verbose, int max_tries);
+RcppExport SEXP _physim_bisse_sim_cpp(SEXP parsSEXP, SEXP crown_ageSEXP, SEXP num_speciesSEXP, SEXP init_stateSEXP, SEXP verboseSEXP, SEXP max_triesSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const std::vector<float>& >::type pars(parsSEXP);
+    Rcpp::traits::input_parameter< float >::type crown_age(crown_ageSEXP);
+    Rcpp::traits::input_parameter< int >::type num_species(num_speciesSEXP);
+    Rcpp::traits::input_parameter< float >::type init_state(init_stateSEXP);
+    Rcpp::traits::input_parameter< bool >::type verbose(verboseSEXP);
+    Rcpp::traits::input_parameter< int >::type max_tries(max_triesSEXP);
+    rcpp_result_gen = Rcpp::wrap(bisse_sim_cpp(pars, crown_age, num_species, init_state, verbose, max_tries));
+    return rcpp_result_gen;
+END_RCPP
+}
 // sim_ddd_cpp
-Rcpp::List sim_ddd_cpp(double la, double mu, double K, double max_t, double num_species, int seed);
-RcppExport SEXP _physim_sim_ddd_cpp(SEXP laSEXP, SEXP muSEXP, SEXP KSEXP, SEXP max_tSEXP, SEXP num_speciesSEXP, SEXP seedSEXP) {
+Rcpp::List sim_ddd_cpp(double la, double mu, double K, double max_t, double num_species, int seed, int max_tries);
+RcppExport SEXP _physim_sim_ddd_cpp(SEXP laSEXP, SEXP muSEXP, SEXP KSEXP, SEXP max_tSEXP, SEXP num_speciesSEXP, SEXP seedSEXP, SEXP max_triesSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -22,13 +38,14 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< double >::type max_t(max_tSEXP);
     Rcpp::traits::input_parameter< double >::type num_species(num_speciesSEXP);
     Rcpp::traits::input_parameter< int >::type seed(seedSEXP);
-    rcpp_result_gen = Rcpp::wrap(sim_ddd_cpp(la, mu, K, max_t, num_species, seed));
+    Rcpp::traits::input_parameter< int >::type max_tries(max_triesSEXP);
+    rcpp_result_gen = Rcpp::wrap(sim_ddd_cpp(la, mu, K, max_t, num_species, seed, max_tries));
     return rcpp_result_gen;
 END_RCPP
 }
 // sim_pbd_cpp
-Rcpp::List sim_pbd_cpp(double la0, double mu0, double la1, double mu1, double trans_rate, double max_t, double num_species, int seed);
-RcppExport SEXP _physim_sim_pbd_cpp(SEXP la0SEXP, SEXP mu0SEXP, SEXP la1SEXP, SEXP mu1SEXP, SEXP trans_rateSEXP, SEXP max_tSEXP, SEXP num_speciesSEXP, SEXP seedSEXP) {
+Rcpp::List sim_pbd_cpp(double la0, double mu0, double la1, double mu1, double trans_rate, double max_t, double num_species, int seed, int max_tries);
+RcppExport SEXP _physim_sim_pbd_cpp(SEXP la0SEXP, SEXP mu0SEXP, SEXP la1SEXP, SEXP mu1SEXP, SEXP trans_rateSEXP, SEXP max_tSEXP, SEXP num_speciesSEXP, SEXP seedSEXP, SEXP max_triesSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -40,14 +57,16 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< double >::type max_t(max_tSEXP);
     Rcpp::traits::input_parameter< double >::type num_species(num_speciesSEXP);
     Rcpp::traits::input_parameter< int >::type seed(seedSEXP);
-    rcpp_result_gen = Rcpp::wrap(sim_pbd_cpp(la0, mu0, la1, mu1, trans_rate, max_t, num_species, seed));
+    Rcpp::traits::input_parameter< int >::type max_tries(max_triesSEXP);
+    rcpp_result_gen = Rcpp::wrap(sim_pbd_cpp(la0, mu0, la1, mu1, trans_rate, max_t, num_species, seed, max_tries));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_physim_sim_ddd_cpp", (DL_FUNC) &_physim_sim_ddd_cpp, 6},
-    {"_physim_sim_pbd_cpp", (DL_FUNC) &_physim_sim_pbd_cpp, 8},
+    {"_physim_bisse_sim_cpp", (DL_FUNC) &_physim_bisse_sim_cpp, 6},
+    {"_physim_sim_ddd_cpp", (DL_FUNC) &_physim_sim_ddd_cpp, 7},
+    {"_physim_sim_pbd_cpp", (DL_FUNC) &_physim_sim_pbd_cpp, 9},
     {NULL, NULL, 0}
 };
 

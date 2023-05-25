@@ -3,6 +3,7 @@
 #include <vector>
 #include <array>
 #include <random>
+#include <cmath>
 
 enum event_type {speciation_g, extinction_g, speciation_i, extinction_i,
                  completion, max_num};
@@ -24,9 +25,12 @@ struct pbd_sim {
   std::array<int, 2> track_crowns;
   finish_type run_info;
 
+  std::vector< std::vector< int > > track_parents;
+
+
   const float lambda_g_;
-  const float lambda_i_;
   const float mu_g_;
+  const float lambda_i_;
   const float mu_i_;
   const float compl_rate;
 
@@ -57,7 +61,10 @@ struct pbd_sim {
     init_randomizer();
   }
 
+  ~pbd_sim() = default;
+
   void run() {
+   // std::cerr << "start\n";
     t = 0.0;
     pop_g.clear();
     pop_i.clear();
@@ -84,9 +91,16 @@ struct pbd_sim {
         run_info = extinct;
         break;
       }
+      if (track_crowns[0] + track_crowns[1] > max_spec_ && max_spec_ > 0) {
+        run_info = overshoot;
+        break;
+      }
+  //    std::cerr << pop_g.size() << " " << pop_i.size() << "\n";
     }
 
+  //  std::cerr << "reducing incipient\n";
     purge_incipient_random();
+ //   std::cerr << "simulation done\n";
   }
 
   void update_rates() {
@@ -129,16 +143,16 @@ struct pbd_sim {
 
   void apply_event(const event_type event) {
     if (event == speciation_g) {
-      do_speciation(pop_g, &pop_i);
+      do_speciation(pop_g, pop_i);
     }
     if (event == speciation_i) {
-      do_speciation(pop_i, &pop_i);
+      do_speciation(pop_i, pop_i);
     }
     if (event == extinction_g) {
-      do_extinction(&pop_g);
+      do_extinction(pop_g);
     }
     if (event == extinction_i) {
-      do_extinction(&pop_i);
+      do_extinction(pop_i);
     }
     if (event == completion) {
       do_completion();
@@ -147,7 +161,7 @@ struct pbd_sim {
   }
 
   void do_speciation(const std::vector<float>& parent_pop,
-                     std::vector<float>* daughter_pop) {
+                     std::vector<float>& daughter_pop) {
     auto dist = std::uniform_int_distribution<size_t>(0, parent_pop.size() - 1);
 
     auto mother = dist(rndgen_);
@@ -160,13 +174,13 @@ struct pbd_sim {
       track_crowns[1]++;
     }
     L.push_back({t, mother_id, daughter_id, -1.f});
-    (*daughter_pop).push_back(daughter_id);
+    daughter_pop.push_back(daughter_id);
   }
 
-  void do_extinction(std::vector<float>* focal_pop) {
-    auto dist = std::uniform_int_distribution<size_t>(0, (*focal_pop).size() - 1);
+  void do_extinction(std::vector<float>& focal_pop) {
+    auto dist = std::uniform_int_distribution<size_t>(0, focal_pop.size() - 1);
     auto unlucky_spec = dist(rndgen_);
-    auto dead_id = (*focal_pop)[unlucky_spec];
+    auto dead_id = focal_pop[unlucky_spec];
     int index = static_cast<int>(dead_id);
     if (index < 0) {
       track_crowns[0]--;
@@ -176,8 +190,8 @@ struct pbd_sim {
     }
     index = index - 1; // starting indexing at 1
     L[index][3] = t;
-    (*focal_pop)[unlucky_spec] = (*focal_pop).back();
-    (*focal_pop).pop_back();
+    focal_pop[unlucky_spec] = focal_pop.back();
+    focal_pop.pop_back();
   }
 
   void do_completion() {
@@ -188,37 +202,76 @@ struct pbd_sim {
     pop_i.pop_back();
   }
 
-  void purge_incipient_random() {
+  void purge_incipient_random2() {
     // we want to select one incipient species per good species
     // and make all others extinct.
-    std::vector< std::vector< float > > parents(L.size() + 1);
-    for (const auto& i : pop_i) {
-      auto parent_id = L[std::abs(i) - 1][2];
-      parent_id = std::abs(parent_id);
-      parents[parent_id].push_back(std::abs(i));
+    std::vector< std::vector< float > > local_parents(L.size() + 10, std::vector<float>());
+
+    for (const auto& i : pop_g) { // these are the good species themselves
+      int parent_id = static_cast<int>(std::fabs(i));
+      local_parents[parent_id].push_back(parent_id);
     }
 
-    for (const auto& j : parents) {
-      if (!j.empty()) {
-        int focal = 0;
-        if (j.size() == 1) {
-          focal = j[0];
-        } else {
-          // draw randomly
-          auto dist = std::uniform_int_distribution<size_t>(0, j.size() - 1);
-          auto index = dist(rndgen_);
-          focal = j[index];
-        }
-        // kill all others.
+    for (const auto& i : pop_i) { // add all incipient daughters
+      int incipient_id = static_cast<int>(std::fabs(i));
+      int parent_id = static_cast<int>(L[incipient_id - 1][1]);
+      parent_id = std::fabs(parent_id);
+      local_parents[parent_id].push_back(incipient_id);
+    }
 
-        for (const auto& i : j) {
-          if (i != focal) {
-            auto index = std::abs(i) - 1;
-            L[index][4] = t;
+    for (size_t j = 0; j < local_parents.size(); ++j) {
+      if (local_parents[j].size() > 1) {
+        auto dist = std::uniform_int_distribution<size_t>(0, local_parents[j].size() - 1);
+        size_t extant_species = dist(rndgen_);
+        for (size_t i = 0; i < local_parents[j].size(); ++i) {
+          if (i != extant_species) {
+            int focal_index = static_cast<int>(std::fabs(local_parents[j][i])) - 1;
+            if (focal_index < 0) throw "index < 0";
+            L[focal_index][4] = t; // fake them being extinct
           }
         }
       }
     }
+    return;
+  }
+
+  void purge_incipient_random() {
+    track_parents.clear();
+    track_parents.resize(L.size() + 1);
+    for (size_t i = 0; i < pop_g.size(); ++i) {
+      int parent_id = std::abs(static_cast<int>(pop_g[i]));
+      track_parents[parent_id].push_back(parent_id);
+    }
+    for (size_t i = 0; i < pop_i.size(); ++i) {
+      int focal_id = std::abs(static_cast<int>(pop_i[i]));
+      // find parent:
+      int parent_id = std::abs(static_cast<int>(L[focal_id - 1][1]));
+      track_parents[parent_id].push_back(focal_id);
+    }
+    // now we go over all collections and make all extinct except one
+    for (size_t i = 0; i < track_parents.size(); ++i) {
+      if (track_parents[i].size() > 1) { // if there is only one, we retain that one
+        std::uniform_int_distribution<int> d(0, track_parents[i].size() - 1);
+        int lucky_one = d(rndgen_);
+        for (size_t j = 0; j < track_parents[i].size(); ++j) {
+          if (j != lucky_one) {
+            L[track_parents[i][j] - 1][3] = t;
+          }
+        }
+      }
+    }
+
+    return;
+  }
+
+
+
+
+  bool is_present(const std::vector<float>& present, float index) {
+    for (const auto& i : present) {
+      if (i == index) return true;
+    }
+    return false;
   }
 
   int get_num_species() {
@@ -227,5 +280,12 @@ struct pbd_sim {
       if (i[3] < 0) cnt++;
     }
     return cnt;
+  }
+
+  size_t get_num_good_species() {
+    return pop_g.size();
+  }
+  size_t get_num_incipient_species() {
+    return pop_i.size();
   }
 };

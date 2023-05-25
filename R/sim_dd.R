@@ -30,15 +30,15 @@ sim_ddd <- function(lambda,
          of lineages")
   }
 
-  res = sim_ddd_cpp(lambda, mu, K, max_t, num_species, seed)
+  res <- sim_ddd_cpp(lambda, mu, K, max_t, num_species, seed)
   ltable <- res$ltable
   crown_age <- res$crown_age
-  if (max_t != -1) crown_age = max_t
+  if (max_t != -1) crown_age <- max_t
   ltable[, 1] <- crown_age - ltable[, 1]
-  notmin1 = which(ltable[, 4] != -1)
-  ltable[notmin1, 4] = crown_age - c(ltable[notmin1, 4])
-  ltable[which(ltable[, 4] == crown_age + 1), 4] = -1
+  notmin1 <- which(ltable[, 4] != -1)
+  ltable[notmin1, 4] <- crown_age - c(ltable[notmin1, 4])
+  ltable[which(ltable[, 4] == crown_age + 1), 4] <- -1
 
-  phy = treestats::l_to_phylo(ltable, !return_fossils)
+  phy <- treestats::l_to_phylo(ltable, !return_fossils)
   return(phy)
 }

@@ -10,10 +10,11 @@ Rcpp::List sim_pbd_cpp(double la0,
                        double trans_rate,
                        double max_t,
                        double num_species,
-                       int seed = -1) {
+                       int seed = -1,
+                       int max_tries = 1e6) {
 
   pbd_sim sim(la0, mu0, la1, mu1, trans_rate, max_t, num_species, seed);
-  while (true) {
+  for (size_t cnt = 0; cnt < max_tries; ++cnt) {
     sim.run();
     if (sim.run_info != extinct) {
       auto sim_num_spec = sim.get_num_species();
@@ -27,7 +28,9 @@ Rcpp::List sim_pbd_cpp(double la0,
     }
   }
   Rcpp::NumericMatrix ltable_for_r;
-  vector_to_numericmatrix(sim.L, &ltable_for_r);
+  vector_to_numericmatrix(sim.L, ltable_for_r);
   return Rcpp::List::create(Rcpp::Named("ltable") = ltable_for_r,
-                            Rcpp::Named("crown_age") = sim.t);
+                            Rcpp::Named("crown_age") = sim.t,
+                            Rcpp::Named("Ng") = sim.get_num_good_species(),
+                            Rcpp::Named("Ni") = sim.get_num_incipient_species());
 }

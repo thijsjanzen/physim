@@ -21,7 +21,7 @@ sim_pbd <- function(lambda0,
                     completion_rate,
                     max_t = -1,
                     num_species = -1,
-                    return_fossils = FALSE,
+                    max_tries = 1e6,
                     seed = -1) {
 
   if (is.infinite(max_t) &&
@@ -31,7 +31,7 @@ sim_pbd <- function(lambda0,
   }
 
   res = sim_pbd_cpp(lambda0, mu0, lambda1, mu1, completion_rate,
-                    max_t, num_species, seed)
+                    max_t, num_species, seed, max_tries)
   ltable <- res$ltable
   crown_age <- res$crown_age
   if (max_t != -1) crown_age = max_t
@@ -40,6 +40,8 @@ sim_pbd <- function(lambda0,
   ltable[notmin1, 4] = crown_age - c(ltable[notmin1, 4])
   ltable[which(ltable[, 4] == crown_age + 1), 4] = -1
 
-  phy = treestats::l_to_phylo(ltable, FALSE)
-  return(phy)
+  phy = treestats::l_to_phylo(ltable, TRUE)
+  return(list(phy = phy,
+              Ng = res$Ng,
+              Ni = res$Ni))
 }
