@@ -212,7 +212,7 @@ struct population {
 };
 
 struct bisse_sim {
-  std::mt19937 rndgen_;
+  std::mt19937_64 rndgen_;
 
   ltable L;
   float t;
@@ -244,7 +244,7 @@ struct bisse_sim {
     init_states(init) {
     // randomize randomizer
     std::random_device rd;
-    std::mt19937 rndgen_t(rd());
+    std::mt19937_64 rndgen_t(rd());
     rndgen_ = rndgen_t;
     run_info = not_run_yet;
     t = 0.0;

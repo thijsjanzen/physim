@@ -11,8 +11,8 @@ Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
 // bisse_sim_cpp
-Rcpp::List bisse_sim_cpp(const std::vector<float>& pars, float crown_age, int num_species, float init_state, bool verbose, int max_tries);
-RcppExport SEXP _physim_bisse_sim_cpp(SEXP parsSEXP, SEXP crown_ageSEXP, SEXP num_speciesSEXP, SEXP init_stateSEXP, SEXP verboseSEXP, SEXP max_triesSEXP) {
+Rcpp::List bisse_sim_cpp(const std::vector<float>& pars, float crown_age, int num_species, float init_state, bool verbose, int max_tries, bool cond_num_species);
+RcppExport SEXP _physim_bisse_sim_cpp(SEXP parsSEXP, SEXP crown_ageSEXP, SEXP num_speciesSEXP, SEXP init_stateSEXP, SEXP verboseSEXP, SEXP max_triesSEXP, SEXP cond_num_speciesSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -22,7 +22,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< float >::type init_state(init_stateSEXP);
     Rcpp::traits::input_parameter< bool >::type verbose(verboseSEXP);
     Rcpp::traits::input_parameter< int >::type max_tries(max_triesSEXP);
-    rcpp_result_gen = Rcpp::wrap(bisse_sim_cpp(pars, crown_age, num_species, init_state, verbose, max_tries));
+    Rcpp::traits::input_parameter< bool >::type cond_num_species(cond_num_speciesSEXP);
+    rcpp_result_gen = Rcpp::wrap(bisse_sim_cpp(pars, crown_age, num_species, init_state, verbose, max_tries, cond_num_species));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -64,7 +65,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_physim_bisse_sim_cpp", (DL_FUNC) &_physim_bisse_sim_cpp, 6},
+    {"_physim_bisse_sim_cpp", (DL_FUNC) &_physim_bisse_sim_cpp, 7},
     {"_physim_sim_ddd_cpp", (DL_FUNC) &_physim_sim_ddd_cpp, 7},
     {"_physim_sim_pbd_cpp", (DL_FUNC) &_physim_sim_pbd_cpp, 9},
     {NULL, NULL, 0}

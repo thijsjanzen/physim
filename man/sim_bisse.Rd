@@ -10,7 +10,8 @@ sim_bisse(
   num_species = 300,
   init_state = -1,
   verbose = FALSE,
-  max_tries = 1e+06
+  max_tries = 1e+06,
+  cond_num_species = TRUE
 )
 }
 \arguments{
@@ -26,7 +27,8 @@ sim_bisse(
 
 \item{max_tries}{maximum number of tries to generate tree}
 
-\item{use_sim1}{use sim1 method}
+\item{cond_num_species}{should simulations be conditions on the number of
+species?}
 }
 \value{
 list

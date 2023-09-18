@@ -21,7 +21,8 @@ Rcpp::List bisse_sim_cpp(const std::vector<float>& pars,
                          int num_species,
                          float init_state,
                          bool verbose,
-                         int max_tries) {
+                         int max_tries,
+                         bool cond_num_species) {
 
     bisse_sim sim( {pars[2], pars[3]}, // mu0, mu1
                    {pars[0], pars[1]}, // lambda0, lambda1
@@ -31,6 +32,8 @@ Rcpp::List bisse_sim_cpp(const std::vector<float>& pars,
                     init_state);
    for (size_t cnt = 0; cnt < max_tries; ++cnt) {
     sim.run();
+    if (!cond_num_species) break;
+
     if (sim.get_num_species() == num_species) {
       break;
     }

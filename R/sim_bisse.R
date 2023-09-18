@@ -5,7 +5,9 @@
 #' @param init_state initial state, if set to -1, 0 or 1 is randomly drawn
 #' @param verbose generate verbose output
 #' @param max_tries maximum number of tries to generate tree
-#' @param use_sim1 use sim1 method
+#' @param cond_num_species should simulations be conditions on the number of
+#' species?
+#' @param drop_extinct should extinct species be dropped from the tree?
 #' @export
 #' @return list
 sim_bisse <- function(pars,
@@ -13,14 +15,17 @@ sim_bisse <- function(pars,
                       num_species = 300,
                       init_state = -1,
                       verbose = FALSE,
-                      max_tries = 1e6) {
-
+                      max_tries = 1e6,
+                      cond_num_species = TRUE,
+                      drop_extinct = TRUE) {
+  stop("This function is not correct\n")
   res <- bisse_sim_cpp(pars,
                        crown_age,
                        num_species,
                        init_state,
                        verbose,
-                       max_tries)
+                       max_tries,
+                       cond_num_species)
 
   if (length(res$traits) < 4) {
     warning("tree went extinct")
@@ -40,7 +45,7 @@ sim_bisse <- function(pars,
   indices       <- seq(1, length(res$traits), by = 2)
   speciesTraits <- 1 + res$traits[indices]
 
-  phy <- treestats::l_to_phylo(Ltable, drop_extinct = TRUE)
+  phy <- treestats::l_to_phylo(Ltable, drop_extinct = drop_extinct)
 
   return(list(phy = phy,
               traits = speciesTraits,
