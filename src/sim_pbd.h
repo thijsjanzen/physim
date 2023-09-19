@@ -71,7 +71,7 @@ struct pbd_sim {
     L.clear();
     run_info = not_run_yet;
     pop_g.push_back(-1.f);
-    pop_g.push_back(2.f);
+    pop_i.push_back(2.f);
     L.push_back({0.0, 0, -1, -1});
     L.push_back({0.0, -1, 2, -1});
 

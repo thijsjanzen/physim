@@ -11,7 +11,8 @@ sim_bisse(
   init_state = -1,
   verbose = FALSE,
   max_tries = 1e+06,
-  cond_num_species = TRUE
+  cond_num_species = TRUE,
+  drop_extinct = TRUE
 )
 }
 \arguments{
@@ -29,6 +30,8 @@ sim_bisse(
 
 \item{cond_num_species}{should simulations be conditions on the number of
 species?}
+
+\item{drop_extinct}{should extinct species be dropped from the tree?}
 }
 \value{
 list
