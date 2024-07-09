@@ -9,16 +9,6 @@ sim_ddd_cpp <- function(la, mu, K, max_t, num_species, seed = -1L, max_tries = 1
     .Call(`_physim_sim_ddd_cpp`, la, mu, K, max_t, num_species, seed, max_tries)
 }
 
-#' rcpp implementation
-#' @param la0 l0
-#' @param mu0 xx
-#' @param la1 xx
-#' @param mu1 xx
-#' @param trans_rate xx
-#' @param max_t max_t
-#' @param max_num_species max_num_species
-#' @param num_tries
-#' @export
 sim_pbd_cpp <- function(la0, mu0, la1, mu1, trans_rate, max_t, max_num_species, num_tries = 100L) {
     .Call(`_physim_sim_pbd_cpp`, la0, mu0, la1, mu1, trans_rate, max_t, max_num_species, num_tries)
 }
