@@ -695,7 +695,7 @@ pbd_sim_orig = function(pars,age,soc = 2,plotit = FALSE, limitsize = Inf, add_sh
     while(t <= age)
     {
       event = DDD::sample2(1:5,size = 1,prob = probs)
-      if(event == 1)
+      if(event == 1) # speciation of good species
       {
         parent = as.numeric(DDD::sample2(sg,1))
         id = id + 1
@@ -703,14 +703,14 @@ pbd_sim_orig = function(pars,age,soc = 2,plotit = FALSE, limitsize = Inf, add_sh
         si = c(si,-id)
         Ni = Ni + 1
       }
-      if(event == 2)
+      if(event == 2) # extinction good species
       {
         todie = as.numeric(DDD::sample2(sg,1))
         L[todie - id1,5] = t
         sg = sg[-which(sg == todie)]
         Ng = Ng - 1
       }
-      if(event == 3)
+      if(event == 3) # completion incipient species
       {
         tocomplete = abs(as.numeric(DDD::sample2(si,1)))
         L[tocomplete - id1,4] = t
@@ -721,7 +721,7 @@ pbd_sim_orig = function(pars,age,soc = 2,plotit = FALSE, limitsize = Inf, add_sh
         Ng = Ng + 1
         Ni = Ni - 1
       }
-      if(event == 4)
+      if(event == 4) # speciation incipient species
       {
         parent = as.numeric(DDD::sample2(si,1))
         id = id + 1
@@ -729,7 +729,7 @@ pbd_sim_orig = function(pars,age,soc = 2,plotit = FALSE, limitsize = Inf, add_sh
         si = c(si,-id)
         Ni = Ni + 1
       }
-      if(event == 5)
+      if(event == 5) # extinction incipient species
       {
         todie = abs(as.numeric(DDD::sample2(si,1)))
         L[todie - id1,5] = t

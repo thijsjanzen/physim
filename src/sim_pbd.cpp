@@ -1,9 +1,10 @@
+/*
+
 #include <Rcpp.h>
 #include "sim_pbd.h"
 #include "util.h"
 
-// [[Rcpp::export]]
-Rcpp::List sim_pbd_cpp(double la0,
+Rcpp::List sim_pbd_old_cpp(double la0,
                        double mu0,
                        double la1,
                        double mu1,
@@ -34,3 +35,4 @@ Rcpp::List sim_pbd_cpp(double la0,
                             Rcpp::Named("Ng") = sim.get_num_good_species(),
                             Rcpp::Named("Ni") = sim.get_num_incipient_species());
 }
+*/

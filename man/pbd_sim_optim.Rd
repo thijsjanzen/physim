@@ -4,7 +4,7 @@
 \alias{pbd_sim_optim}
 \title{Function to simulate the protracted speciation process}
 \usage{
-pbd_sim_optim(pars, age)
+pbd_sim_optim(pars, age, max_n = 1e+06)
 }
 \arguments{
 \item{pars}{Vector of parameters: \cr \cr \code{pars[1]} corresponds to b_1,

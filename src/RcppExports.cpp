@@ -45,8 +45,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // sim_pbd_cpp
-Rcpp::List sim_pbd_cpp(double la0, double mu0, double la1, double mu1, double trans_rate, double max_t, double num_species, int seed, int max_tries);
-RcppExport SEXP _physim_sim_pbd_cpp(SEXP la0SEXP, SEXP mu0SEXP, SEXP la1SEXP, SEXP mu1SEXP, SEXP trans_rateSEXP, SEXP max_tSEXP, SEXP num_speciesSEXP, SEXP seedSEXP, SEXP max_triesSEXP) {
+Rcpp::List sim_pbd_cpp(double la0, double mu0, double la1, double mu1, double trans_rate, double max_t, double max_num_species, int num_tries);
+RcppExport SEXP _physim_sim_pbd_cpp(SEXP la0SEXP, SEXP mu0SEXP, SEXP la1SEXP, SEXP mu1SEXP, SEXP trans_rateSEXP, SEXP max_tSEXP, SEXP max_num_speciesSEXP, SEXP num_triesSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -56,10 +56,9 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< double >::type mu1(mu1SEXP);
     Rcpp::traits::input_parameter< double >::type trans_rate(trans_rateSEXP);
     Rcpp::traits::input_parameter< double >::type max_t(max_tSEXP);
-    Rcpp::traits::input_parameter< double >::type num_species(num_speciesSEXP);
-    Rcpp::traits::input_parameter< int >::type seed(seedSEXP);
-    Rcpp::traits::input_parameter< int >::type max_tries(max_triesSEXP);
-    rcpp_result_gen = Rcpp::wrap(sim_pbd_cpp(la0, mu0, la1, mu1, trans_rate, max_t, num_species, seed, max_tries));
+    Rcpp::traits::input_parameter< double >::type max_num_species(max_num_speciesSEXP);
+    Rcpp::traits::input_parameter< int >::type num_tries(num_triesSEXP);
+    rcpp_result_gen = Rcpp::wrap(sim_pbd_cpp(la0, mu0, la1, mu1, trans_rate, max_t, max_num_species, num_tries));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -67,7 +66,7 @@ END_RCPP
 static const R_CallMethodDef CallEntries[] = {
     {"_physim_bisse_sim_cpp", (DL_FUNC) &_physim_bisse_sim_cpp, 7},
     {"_physim_sim_ddd_cpp", (DL_FUNC) &_physim_sim_ddd_cpp, 7},
-    {"_physim_sim_pbd_cpp", (DL_FUNC) &_physim_sim_pbd_cpp, 9},
+    {"_physim_sim_pbd_cpp", (DL_FUNC) &_physim_sim_pbd_cpp, 8},
     {NULL, NULL, 0}
 };
 
