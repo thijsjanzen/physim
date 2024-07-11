@@ -1,0 +1,106 @@
+---
+title: "abc_rf"
+author: "Thijs Janzen"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+require(tidyverse)
+require(abcrf)
+require(physim)
+```
+
+## ABC_RF
+
+To do ABC_RF, we need to generate a training data set. To do so, we generate 
+parameters from the prior and store any trees that are of sufficient (but not too large) size. For these trees, we then calculate summary statistics to obtain our training data.
+This does impose an arbitrary question: what kind of priors do we use, and to which extent does this influence our training data? I'm unsure about this, but happy to discuss this further. For now, we will choose exponential priors on all parameters, with lower expected mean values for the extinction rates.
+
+Prior means are in the order c(la_g, la_i, mu_g, mu_i, la_3), where g is good species, i is incipient species and la_3 is the completion rate. Whereas we put in prior means, these are really the lambda values for the exponential distribution, so 1 / expected value (this needs to be changed later on I guess).
+
+To be able to generate a training data set, we condition on crown age and survival, and on the number of lineages. To make this mean anything, we first simulate a fake 'empirical' tree:
+```{r fake_empirical_tree}
+crown_age <- 40
+emp_tree <- physim::pbd_sim_rcpp(pars = c(0.1, # b1
+                                          0.1,   #c1
+                                          0.1, #b2
+                                          0.0, #mu1
+                                          0.0), #mu2),
+                                   age = crown_age)
+num_lin <- treestats::number_of_lineages(emp_tree)
+min_lin <- num_lin * 0.5
+max_lin <- num_lin * 1.5
+```
+
+I already restrict the tree size to be within the range of the target tree, as this is easily done. Then, we generate our reference data set (notice that more trees is better, but for the sake of not running for too long, I chose a limited amount)
+
+```{r generate training data}
+ref_table <- physim::generate_trees_tbb(number_of_trees = 10000,
+                                        prior_means = c(1, 1, 10, 10, 1),
+                                        min_tips = min_lin,
+                                        max_tips = max_lin,
+                                        crown_age = crown_age,
+                                        num_threads = 8)
+```
+
+We can visualize the priors:
+
+```{r priors}
+ref_table %>%
+  gather(key = "parameter" ,value = "value", c(lambda0, lambda1, mu0, mu1, compl_rate)) %>%
+  ggplot(aes(x = value)) +
+    geom_density() +
+    scale_x_log10() + 
+    facet_grid(rows = vars(parameter), scales = "free")  +
+    theme_classic()
+
+
+```
+
+We see that we have explored the priors quite reasonably. Now, we can train our random forest, however we have to do this separately for each parameter, inconveniently enough.
+
+```{r abc_rf}
+ref_stats <- as.data.frame(t(treestats::calc_all_stats(emp_tree)))
+
+
+sum_stats <- ref_table[, 6:75]
+
+result <- c()
+param_names <- colnames(ref_table)[1:5]
+
+opar <- par()
+
+par(mfrow = c(5, 2))
+par(mar = c(2, 2, 2, 2))
+
+for (i in 1:5) {
+  param <- ref_table[, i]
+  data2 <- data.frame(param, sum_stats)
+  colnames(data2)[1] <- "r"
+  forest <- abcrf::regAbcrf(r ~ ., data2, ntree = 1000, paral = TRUE)
+  plot(forest, main = param_names[i])
+  vv <- predict(forest, ref_stats, data2, paral = TRUE)
+  abcrf::densityPlot(forest, ref_stats, data2, main = param_names[i])
+  to_add <- c(vv$expectation, vv$quantiles)
+  result <- rbind(result, to_add)
+}
+
+par(opar)
+```
+
+Clearly, for some parameters the posterior estimate is not very far from the prior distribution, which is a bit worrying. Overall, we found the following estimates:
+```{r estimates}
+result
+```
+
+If we compare this to the values we used to simulate the tree c(0.1, 0.1, 0.0, 0.0, 0.1), then we are quite far away it seems, although extinction rates are estimated to be lower. Because we have chosen good and incipient species to have the same speciation rate, we can compare with ML:
+
+```{r ML}
+res <- PBD::pbd_ML(brts = treestats::branching_times(emp_tree))
+res
+```
+Which is a much better estimate...
+
+

@@ -27,6 +27,60 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// draw_from_prior_rcpp
+std::vector<double> draw_from_prior_rcpp(const std::vector<double>& prior_means);
+RcppExport SEXP _physim_draw_from_prior_rcpp(SEXP prior_meansSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const std::vector<double>& >::type prior_means(prior_meansSEXP);
+    rcpp_result_gen = Rcpp::wrap(draw_from_prior_rcpp(prior_means));
+    return rcpp_result_gen;
+END_RCPP
+}
+// prior_dens_rcpp
+double prior_dens_rcpp(const std::vector<double>& prior_means, const std::vector<double>& x);
+RcppExport SEXP _physim_prior_dens_rcpp(SEXP prior_meansSEXP, SEXP xSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const std::vector<double>& >::type prior_means(prior_meansSEXP);
+    Rcpp::traits::input_parameter< const std::vector<double>& >::type x(xSEXP);
+    rcpp_result_gen = Rcpp::wrap(prior_dens_rcpp(prior_means, x));
+    return rcpp_result_gen;
+END_RCPP
+}
+// create_ref_table_tbb_par
+Rcpp::List create_ref_table_tbb_par(int num_repl, std::vector<double> prior_means, double crown_age, int min_lin, int max_lin);
+RcppExport SEXP _physim_create_ref_table_tbb_par(SEXP num_replSEXP, SEXP prior_meansSEXP, SEXP crown_ageSEXP, SEXP min_linSEXP, SEXP max_linSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< int >::type num_repl(num_replSEXP);
+    Rcpp::traits::input_parameter< std::vector<double> >::type prior_means(prior_meansSEXP);
+    Rcpp::traits::input_parameter< double >::type crown_age(crown_ageSEXP);
+    Rcpp::traits::input_parameter< int >::type min_lin(min_linSEXP);
+    Rcpp::traits::input_parameter< int >::type max_lin(max_linSEXP);
+    rcpp_result_gen = Rcpp::wrap(create_ref_table_tbb_par(num_repl, prior_means, crown_age, min_lin, max_lin));
+    return rcpp_result_gen;
+END_RCPP
+}
+// create_ref_table_serial
+Rcpp::List create_ref_table_serial(int num_repl, std::vector<double> prior_means, double crown_age, int min_lin, int max_lin, int num_threads);
+RcppExport SEXP _physim_create_ref_table_serial(SEXP num_replSEXP, SEXP prior_meansSEXP, SEXP crown_ageSEXP, SEXP min_linSEXP, SEXP max_linSEXP, SEXP num_threadsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< int >::type num_repl(num_replSEXP);
+    Rcpp::traits::input_parameter< std::vector<double> >::type prior_means(prior_meansSEXP);
+    Rcpp::traits::input_parameter< double >::type crown_age(crown_ageSEXP);
+    Rcpp::traits::input_parameter< int >::type min_lin(min_linSEXP);
+    Rcpp::traits::input_parameter< int >::type max_lin(max_linSEXP);
+    Rcpp::traits::input_parameter< int >::type num_threads(num_threadsSEXP);
+    rcpp_result_gen = Rcpp::wrap(create_ref_table_serial(num_repl, prior_means, crown_age, min_lin, max_lin, num_threads));
+    return rcpp_result_gen;
+END_RCPP
+}
 // sim_ddd_cpp
 Rcpp::List sim_ddd_cpp(double la, double mu, double K, double max_t, double num_species, int seed, int max_tries);
 RcppExport SEXP _physim_sim_ddd_cpp(SEXP laSEXP, SEXP muSEXP, SEXP KSEXP, SEXP max_tSEXP, SEXP num_speciesSEXP, SEXP seedSEXP, SEXP max_triesSEXP) {
@@ -65,6 +119,10 @@ END_RCPP
 
 static const R_CallMethodDef CallEntries[] = {
     {"_physim_bisse_sim_cpp", (DL_FUNC) &_physim_bisse_sim_cpp, 7},
+    {"_physim_draw_from_prior_rcpp", (DL_FUNC) &_physim_draw_from_prior_rcpp, 1},
+    {"_physim_prior_dens_rcpp", (DL_FUNC) &_physim_prior_dens_rcpp, 2},
+    {"_physim_create_ref_table_tbb_par", (DL_FUNC) &_physim_create_ref_table_tbb_par, 5},
+    {"_physim_create_ref_table_serial", (DL_FUNC) &_physim_create_ref_table_serial, 6},
     {"_physim_sim_ddd_cpp", (DL_FUNC) &_physim_sim_ddd_cpp, 7},
     {"_physim_sim_pbd_cpp", (DL_FUNC) &_physim_sim_pbd_cpp, 8},
     {NULL, NULL, 0}

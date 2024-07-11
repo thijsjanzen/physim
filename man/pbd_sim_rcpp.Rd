@@ -4,7 +4,7 @@
 \alias{pbd_sim_rcpp}
 \title{Function to simulate the protracted speciation process}
 \usage{
-pbd_sim_rcpp(pars, age, upper_species_limit, num_tries = 100)
+pbd_sim_rcpp(pars, age, upper_species_limit = 10000, num_tries = 100)
 }
 \arguments{
 \item{pars}{Vector of parameters: \cr \cr \code{pars[1]} corresponds to b_1,
@@ -17,24 +17,22 @@ corresponds to b_2, the speciation-initiation rate of incipient species \cr
 
 \item{age}{Sets the crown age for the simulation}
 
-\item{upper_species_limit}{stops simulation if the number of good + the number
-of incipient species exceeds this number}
+\item{upper_species_limit}{stops simulation if the number of good + the
+number of incipient species exceeds this number}
 
 \item{num_tries}{number of times to re-start the simulation in case of
-extinction (all species dead) or overflow (if upper_species_limit is exceeded)}
+extinction (all species dead) or overflow (if upper_species_limit is
+exceeded)}
 }
 \value{
-phy object
+phy object in case of success, or a string ("extinction" or
+"overflow",
+if no tree could be generated within num_tries tries).
 }
 \description{
-Simulating the protracted speciation process using the Doob-Gillespie
-algorithm. This function differs from pbd_sim_cpp that 1) it does not
-require that the speciation-initiation rate is the same for good and
-incipient species, and 2) that it simulates the exact protracted speciation
-process, and not the approximation made by the coalescent point process.
-This function provides also the conversion to the approximation as output.
+Function to simulate the protracted speciation process
 }
 \author{
-Rampal S. Etienne
+Thijs Janzen
 }
 \keyword{models}

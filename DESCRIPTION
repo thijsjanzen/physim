@@ -1,14 +1,21 @@
 Package: physim
 Type: Package
-Title: What the Package Does in One 'Title Case' Line
-Version: 1.0
-Date: 2023-05-22
-Author: Your Name
-Maintainer: Your Name <your@email.com>
-Description: One paragraph description of what the package does as one or more
-        full sentences.
+Title: Simulate phylogenetic trees using C++
+Version: 0.3
+Date: 2024-07-10
+Author: Thijs Janzen
+Maintainer: Thijs Janzen <thijsjanzen@gmail.com>
+Description: simulatiooons
 License: GPL (>= 2)
-Imports: Rcpp (>= 1.0.10)
-LinkingTo: Rcpp
+Depends:
+    Rcpp,
+    RcppParallel,
+    treestats
+LinkingTo: 
+    Rcpp,
+    RcppParallel,
+    treestats
+Imports:
+    pbmcapply
 RoxygenNote: 7.3.1
 Encoding: UTF-8

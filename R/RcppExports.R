@@ -5,6 +5,50 @@ bisse_sim_cpp <- function(pars, crown_age, num_species, init_state, verbose, max
     .Call(`_physim_bisse_sim_cpp`, pars, crown_age, num_species, init_state, verbose, max_tries, cond_num_species)
 }
 
+#' function to generate 5 parameters from exponential prior, given mean
+#' values
+#' @param prior_means vector of prior means
+#' @return vector of values
+#' @export
+draw_from_prior_rcpp <- function(prior_means) {
+    .Call(`_physim_draw_from_prior_rcpp`, prior_means)
+}
+
+#' function to calculate density of parameters
+#' @param prior_means vector of prior means
+#' @param x vector of x values for which to calculate the density
+#' @return vector of values
+#' @export
+prior_dens_rcpp <- function(prior_means, x) {
+    .Call(`_physim_prior_dens_rcpp`, prior_means, x)
+}
+
+#' simulate many trees drawing from the prior
+#' @param num_repl a vector that indicates the time points of water level changes
+#' @param crown_age crown age of the tree to be simulated
+#' @param min_lin minimum number of lineages
+#' @param max_lin maximum number of lineages
+#' @return list with two entries: 1) list of newick strings, 2) matrix of
+#' used parameter values
+#' @export
+create_ref_table_tbb_par <- function(num_repl, prior_means, crown_age, min_lin, max_lin) {
+    .Call(`_physim_create_ref_table_tbb_par`, num_repl, prior_means, crown_age, min_lin, max_lin)
+}
+
+#' simulate many trees drawing from the prior serially
+#' @param num_repl a vector that indicates the time points of water level changes
+#' @param prior_means means of 5 priors
+#' @param crown_age crown age of the tree to be simulated
+#' @param min_lin minimum number of lineages
+#' @param max_lin maximum number of lineages
+#' @param num_threads number of threads
+#' @return list with two entries: 1) list of newick strings, 2) matrix of
+#' used parameter values
+#' @export
+create_ref_table_serial <- function(num_repl, prior_means, crown_age, min_lin, max_lin, num_threads) {
+    .Call(`_physim_create_ref_table_serial`, num_repl, prior_means, crown_age, min_lin, max_lin, num_threads)
+}
+
 sim_ddd_cpp <- function(la, mu, K, max_t, num_species, seed = -1L, max_tries = 1e6L) {
     .Call(`_physim_sim_ddd_cpp`, la, mu, K, max_t, num_species, seed, max_tries)
 }

@@ -64,6 +64,21 @@ struct sim_pbd {
       rndgen_ = rndgen_t;
     }
 
+  sim_pbd(const std::array<double, 5>& p,
+          double maximum_time,
+          int max_num) :
+    spec_rate{p[0], p[2]},
+    ext_rate{p[1], p[3]},
+    compl_rate(p[4]),
+    max_t(maximum_time),
+    upper_limit_species(max_num) {
+      t = 0.0;
+      total_rate = 1e6f;
+      std::random_device rd;
+      std::mt19937_64 rndgen_t(rd());
+      rndgen_ = rndgen_t;
+    }
+
   void run() {
     t = 0.0;
     sp_number = 1;
@@ -252,3 +267,24 @@ struct sim_pbd {
     return num_incipient_species;
   }
 };
+
+inline std::vector< std::array<double, 4>> sim_once(const std::array<double, 5>& params,
+                     double crown_age,
+                     int max_num_species,
+                     bool *success,
+                     int *num_lin) {
+
+  sim_pbd sim(params, crown_age, max_num_species);
+  *success = false;
+  sim.run();
+
+  if (sim.status == "success") *success = true;
+
+  *num_lin = 0;
+  for (const auto& i : sim.L) {
+    if (i[species_property::death_time] == -1) (*num_lin)++;
+  }
+
+  return(sim.L);
+}
+
