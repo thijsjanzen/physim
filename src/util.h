@@ -27,3 +27,15 @@ inline void vector_to_numericmatrix(const std::vector< std::array< double, 4 >>&
   }
   return;
 }
+
+inline void particle_to_numericmatrix(const std::vector< std::array<double, 10>>& v,
+                                    Rcpp::NumericMatrix& m) {
+  int n_rows = v.size();
+  m = Rcpp::NumericMatrix(n_rows, 10);
+  for (int i = 0; i < n_rows; ++i) {
+    for (int j = 0; j < 4; ++j) {
+      m(i, j) = v[i][j];
+    }
+  }
+  return;
+}

@@ -10,6 +10,26 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
+// perform_abc_rcpp
+Rcpp::NumericMatrix perform_abc_rcpp(int num_particles, int num_iterations, double crown_age, double min_lin, double max_lin, std::vector<double> lambdas, double s, double obs_gamma, double obs_colless, double obs_num_lin);
+RcppExport SEXP _physim_perform_abc_rcpp(SEXP num_particlesSEXP, SEXP num_iterationsSEXP, SEXP crown_ageSEXP, SEXP min_linSEXP, SEXP max_linSEXP, SEXP lambdasSEXP, SEXP sSEXP, SEXP obs_gammaSEXP, SEXP obs_collessSEXP, SEXP obs_num_linSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< int >::type num_particles(num_particlesSEXP);
+    Rcpp::traits::input_parameter< int >::type num_iterations(num_iterationsSEXP);
+    Rcpp::traits::input_parameter< double >::type crown_age(crown_ageSEXP);
+    Rcpp::traits::input_parameter< double >::type min_lin(min_linSEXP);
+    Rcpp::traits::input_parameter< double >::type max_lin(max_linSEXP);
+    Rcpp::traits::input_parameter< std::vector<double> >::type lambdas(lambdasSEXP);
+    Rcpp::traits::input_parameter< double >::type s(sSEXP);
+    Rcpp::traits::input_parameter< double >::type obs_gamma(obs_gammaSEXP);
+    Rcpp::traits::input_parameter< double >::type obs_colless(obs_collessSEXP);
+    Rcpp::traits::input_parameter< double >::type obs_num_lin(obs_num_linSEXP);
+    rcpp_result_gen = Rcpp::wrap(perform_abc_rcpp(num_particles, num_iterations, crown_age, min_lin, max_lin, lambdas, s, obs_gamma, obs_colless, obs_num_lin));
+    return rcpp_result_gen;
+END_RCPP
+}
 // bisse_sim_cpp
 Rcpp::List bisse_sim_cpp(const std::vector<float>& pars, float crown_age, int num_species, float init_state, bool verbose, int max_tries, bool cond_num_species);
 RcppExport SEXP _physim_bisse_sim_cpp(SEXP parsSEXP, SEXP crown_ageSEXP, SEXP num_speciesSEXP, SEXP init_stateSEXP, SEXP verboseSEXP, SEXP max_triesSEXP, SEXP cond_num_speciesSEXP) {
@@ -116,8 +136,28 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// sim_pbd_conditional_cpp
+Rcpp::List sim_pbd_conditional_cpp(double la0, double mu0, double la1, double mu1, double trans_rate, double max_t, double min_num_species, double max_num_species, int num_tries);
+RcppExport SEXP _physim_sim_pbd_conditional_cpp(SEXP la0SEXP, SEXP mu0SEXP, SEXP la1SEXP, SEXP mu1SEXP, SEXP trans_rateSEXP, SEXP max_tSEXP, SEXP min_num_speciesSEXP, SEXP max_num_speciesSEXP, SEXP num_triesSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< double >::type la0(la0SEXP);
+    Rcpp::traits::input_parameter< double >::type mu0(mu0SEXP);
+    Rcpp::traits::input_parameter< double >::type la1(la1SEXP);
+    Rcpp::traits::input_parameter< double >::type mu1(mu1SEXP);
+    Rcpp::traits::input_parameter< double >::type trans_rate(trans_rateSEXP);
+    Rcpp::traits::input_parameter< double >::type max_t(max_tSEXP);
+    Rcpp::traits::input_parameter< double >::type min_num_species(min_num_speciesSEXP);
+    Rcpp::traits::input_parameter< double >::type max_num_species(max_num_speciesSEXP);
+    Rcpp::traits::input_parameter< int >::type num_tries(num_triesSEXP);
+    rcpp_result_gen = Rcpp::wrap(sim_pbd_conditional_cpp(la0, mu0, la1, mu1, trans_rate, max_t, min_num_species, max_num_species, num_tries));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_physim_perform_abc_rcpp", (DL_FUNC) &_physim_perform_abc_rcpp, 10},
     {"_physim_bisse_sim_cpp", (DL_FUNC) &_physim_bisse_sim_cpp, 7},
     {"_physim_draw_from_prior_rcpp", (DL_FUNC) &_physim_draw_from_prior_rcpp, 1},
     {"_physim_prior_dens_rcpp", (DL_FUNC) &_physim_prior_dens_rcpp, 2},
@@ -125,6 +165,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_physim_create_ref_table_serial", (DL_FUNC) &_physim_create_ref_table_serial, 6},
     {"_physim_sim_ddd_cpp", (DL_FUNC) &_physim_sim_ddd_cpp, 7},
     {"_physim_sim_pbd_cpp", (DL_FUNC) &_physim_sim_pbd_cpp, 8},
+    {"_physim_sim_pbd_conditional_cpp", (DL_FUNC) &_physim_sim_pbd_conditional_cpp, 9},
     {NULL, NULL, 0}
 };
 

@@ -6,6 +6,8 @@
 \usage{
 abc_smc(
   ref_tree,
+  min_lin,
+  max_lin,
   statistics,
   simulation_function,
   init_epsilon_value,
@@ -47,7 +49,9 @@ stop the ABC-SMC algorithm  and assume convergence.}
 \item{num_threads}{num_threads}
 
 \item{tree}{an object of class \code{"phylo"}; the tree upon which we want
-to fit our diversification model}
+to fit our diversification model
+@param min_lin min_lin
+@param max_lin max_lin}
 
 \item{init_epsilon_values}{A vector containing the initial threshold values
 for the summary statistics from the vector \code{statistics}.}

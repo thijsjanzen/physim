@@ -11,6 +11,7 @@
 
 #include "sim_pbd.h"
 #include "L2newick.h"
+#include "rnd_thijs.h"
 
 size_t get_rcpp_num_threads() {
   auto* nt_env = std::getenv("RCPP_PARALLEL_NUM_THREADS");
@@ -19,16 +20,11 @@ size_t get_rcpp_num_threads() {
   : static_cast<size_t>(std::atoi(nt_env));
 }
 
-double draw_exp(double lambda, std::mt19937_64& rng) {
-  if (lambda == 0.0) return 1e20f;
-  return std::exponential_distribution<double>(lambda)(rng);
-}
-
-std::array<double, 5> draw_from_prior(std::mt19937_64& rng,
+std::array<double, 5> draw_from_prior(rnd_t& rndgen,
                                       const std::vector<double>& prior_means) {
   std::array<double, 5> params;
   for (size_t i = 0; i < 5; ++i) {
-    params[i] = draw_exp(prior_means[i], rng);
+    params[i] = rndgen.exp(prior_means[i]);
   } // order: la_0, la_1, mu_0, mu_1, comp_time
 
   return params;
@@ -41,10 +37,11 @@ std::array<double, 5> draw_from_prior(std::mt19937_64& rng,
 //' @export
 // [[Rcpp::export]]
 std::vector<double> draw_from_prior_rcpp(const std::vector<double>& prior_means) {
-  std::mt19937_64 rng(std::random_device{}());
+  rnd_t rndgen;
+
   std::vector<double> answ(5);
   for (size_t i = 0; i < 5; ++i) {
-    answ[i] = draw_exp(prior_means[i], rng);
+    answ[i] = rndgen.exp(prior_means[i]);
   } // order: la_0, la_1, mu_0, mu_1, comp_time
 
   return answ;
@@ -64,8 +61,6 @@ double prior_dens_rcpp(const std::vector<double>& prior_means,
   }
   return exp(answ);
 }
-
-
 
 //' simulate many trees drawing from the prior
 //' @param num_repl a vector that indicates the time points of water level changes
@@ -125,12 +120,12 @@ double prior_dens_rcpp(const std::vector<double>& prior_means,
        tbb::blocked_range<unsigned>(0, loop_size),
        [&](const tbb::blocked_range<unsigned>& r) {
 
-         std::random_device rd;
-         auto reng = std::mt19937_64(rd()) ;
+         rnd_t rndgen;
+
          bool success = false;
          int num_lin = 0;
          for (unsigned i = r.begin(); i < r.end(); ++i) {
-           auto parameters = draw_from_prior(reng, prior_means);
+           auto parameters = draw_from_prior(rndgen, prior_means);
 
            auto l_table = sim_once(parameters,
                                    crown_age,
@@ -217,11 +212,11 @@ Rcpp::List create_ref_table_serial(int num_repl,
     std::vector< bool > add_flag(loop_size, false);
 
     std::random_device rd;
-    auto reng = std::mt19937_64(rd()) ;
+    rnd_t rndgen;
     bool success = false;
     int num_lin = 0;
     for (unsigned i = 0; i < loop_size; ++i) {
-      auto parameters = draw_from_prior(reng, prior_means);
+      auto parameters = draw_from_prior(rndgen, prior_means);
 
       auto l_table = sim_once(parameters,
                               crown_age,

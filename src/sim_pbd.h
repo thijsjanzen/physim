@@ -59,8 +59,8 @@ struct sim_pbd {
     upper_limit_species(max_num) {
       t = 0.0;
       total_rate = 1e6f;
-      std::random_device rd;
-      std::mt19937_64 rndgen_t(rd());
+
+      std::mt19937_64 rndgen_t(3);
       rndgen_ = rndgen_t;
     }
 
@@ -74,8 +74,8 @@ struct sim_pbd {
     upper_limit_species(max_num) {
       t = 0.0;
       total_rate = 1e6f;
-      std::random_device rd;
-      std::mt19937_64 rndgen_t(rd());
+
+      std::mt19937_64 rndgen_t(3);
       rndgen_ = rndgen_t;
     }
 
@@ -88,7 +88,6 @@ struct sim_pbd {
     pop_ext.clear();
     pop_compl.clear();
     pop_sp_number.clear();
-
 
     L.push_back({0.0, 0, -1, -1});
     L.push_back({0.0, -1, 2, -1});
