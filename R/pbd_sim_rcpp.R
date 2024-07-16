@@ -89,14 +89,14 @@ pbd_sim_conditional_rcpp = function(pars,
   mu2 = pars[5]
 
   res <- sim_pbd_conditional_cpp(b1,
-                     mu1,
-                     b2,
-                     mu2,
-                     c1,
-                     age,
-                     min_species,
-                     max_species,
-                     num_tries)
+                                 mu1,
+                                 b2,
+                                 mu2,
+                                 c1,
+                                 age,
+                                 min_species,
+                                 max_species,
+                                 num_tries)
 
   if (res$status == "success") {
     phy <- try(treestats::l_to_phylo(res$ltable))

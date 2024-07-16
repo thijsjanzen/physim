@@ -60,7 +60,8 @@ struct sim_pbd {
       t = 0.0;
       total_rate = 1e6f;
 
-      std::mt19937_64 rndgen_t(3);
+      std::random_device d;
+      std::mt19937_64 rndgen_t(d());
       rndgen_ = rndgen_t;
     }
 
@@ -75,19 +76,26 @@ struct sim_pbd {
       t = 0.0;
       total_rate = 1e6f;
 
-      std::mt19937_64 rndgen_t(3);
+      //std::mt19937_64 rndgen_t(3);
+      std::random_device d;
+      std::mt19937_64 rndgen_t(d());
       rndgen_ = rndgen_t;
     }
 
-  void run() {
-    t = 0.0;
-    sp_number = 1;
+  void clear_containers() {
     L.clear();
     pop.clear();
     pop_spec.clear();
     pop_ext.clear();
     pop_compl.clear();
     pop_sp_number.clear();
+  }
+
+  void run() {
+    t = 0.0;
+    sp_number = 1;
+
+    clear_containers();
 
     L.push_back({0.0, 0, -1, -1});
     L.push_back({0.0, -1, 2, -1});
