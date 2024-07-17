@@ -48,7 +48,7 @@ Rcpp::List sim_pbd_conditional_cpp(double la0,
                        double max_num_species,
                        int num_tries = 100) {
 
-  sim_pbd sim(la0, la1, mu0, mu1, trans_rate, max_t, max_num_species * 10);
+  sim_pbd sim(la0, la1, mu0, mu1, trans_rate, max_t, 100000);
   size_t num_species = 0;
   bool found_num_species = false;
   for (size_t i = 0; i < num_tries; ++i) {

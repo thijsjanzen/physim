@@ -62,3 +62,17 @@
 .vscode/tasks.json
 test.R
 .Rproj.user
+abc_rf.Rmd
+abc_rf_good.html
+abc_rf_old.html
+abc_smc.html
+abc_smc.Rmd
+res_1.txt
+test.txt
+test_abc.R
+test_abc_rcpp.R
+test_parallel.R
+abc_rf.Rmd
+abc_rf.html
+.Rhistory
+.RData

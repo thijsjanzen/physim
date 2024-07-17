@@ -22,7 +22,7 @@
 #' @export
 pbd_sim_rcpp = function(pars,
                         age,
-                        upper_species_limit = 10000,
+                        upper_species_limit = 100000,
                         num_tries = 100) {
   b1 = pars[1]
   c1 = pars[2]
