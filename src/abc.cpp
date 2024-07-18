@@ -7,10 +7,18 @@ void update_output(std::vector< std::array<double, 10>>& out,
                    int iteration) {
 
   for (const auto& i : gen) {
-    out.push_back({static_cast<double>(iteration),
-                  i.params_[0], i.params_[1], i.params_[2], i.params_[3], i.params_[4],
-                  i.gamma, i.colless,
-                  static_cast<double>(i.num_lin), i.weight});
+
+    std::array<double, 10> to_add;
+    to_add[0] = static_cast<double>(iteration);
+    for (size_t j = 0; j < i.params_.size(); ++j) {
+      to_add[j + 1] = i.params_[j];
+    }
+    to_add[6] = i.gamma;
+    to_add[7] = i.colless;
+    to_add[8] = static_cast<double>(i.num_lin);
+    to_add[9] = i.weight;
+
+    out.push_back(to_add);
   }
   return;
 }

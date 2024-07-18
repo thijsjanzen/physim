@@ -19,81 +19,114 @@ std::vector<double> brts_from_ltable(const ltable& L) {
   return out;
 }
 
+void sort_by_time(ltable& ltab) {
+  std::sort(ltab.begin(), ltab.end(), [&](const auto& a, const auto& b) {
+    return a[species_property::birth_time] > b[species_property::birth_time];
+  });
+}
+
 ltable drop_extinct(const ltable& L) {
   ltable out;
-  out.reserve(L.size());
-  for (const auto& j : L) {
-    if (j[3] < 0) {
-      out.push_back(j);
+  out.reserve(L.size() - 2);
+  for (size_t i = 0; i < L.size(); ++i) {
+    if (L[i][species_property::death_time] < 0) {
+      out.push_back(L[i]);
     }
   }
 
-  // now we have a broken Ltable, we need to fill in parents of parents
-  for (size_t i = 0; i < out.size(); ++i) {
-    auto parent = out[i][species_property::parent];
-    if (parent != 0) {
-      // find parent:
-      bool parent_found = false;
-      while (!parent_found) {
-        for (size_t j = 0; j < i; ++j) {
-          if (out[j][species_property::id] == parent) {
-            parent_found = true;
-            break;
-          }
-        }
-        if (!parent_found) {
-          for (size_t j = 0; j < L.size(); ++j) {
-            if (L[j][species_property::id] == parent) {
-              out[j][species_property::parent] = L[j][species_property::parent];
-              out[j][species_property::birth_time] = L[j][species_property::birth_time];
-              parent = out[j][species_property::parent];
-              break;
-            }
-          }
-        }
-      }
-    }
-  }
-
-  // now, sort by branching time:
-  std::sort(out.begin(), out.end(), [&](const auto& a, const auto& b) {
-    return a[0] > b[0];
-  });
-
-std::cerr << "\n";
+  /*std::cerr << "\noriginal_ltable: \n";
   for (const auto& i : L) {
     for (const auto& j : i) {
       std::cerr << j << " ";
     } std::cerr << "\n";
   }
 
-  std::cerr << "\n";
+  std::cerr << "\nltable without extinct: \n";
   for (const auto& i : out) {
     for (const auto& j : i) {
       std::cerr << j << " ";
     } std::cerr << "\n";
+  }*/
+
+  // sort by branching time:
+  sort_by_time(out);
+
+  // now we have a broken Ltable, we need to fill in parents of parents
+  for (int i = out.size() - 1; i >= 2; ) {
+    auto parent = out[i][species_property::parent];
+
+    if (parent == 0) break; // we are at the root.
+
+    bool parent_found = false;
+
+    for (size_t j = 0; j < i; ++j) {
+      if (out[j][species_property::id] == parent) {
+        parent_found = true;
+        break;
+      }
+    }
+    if (!parent_found) {
+      size_t j = 0;
+      for (; j < L.size(); ++j) {
+        if (L[j][species_property::id] == parent) {
+          break;
+        }
+      }
+      auto old_id = out[i][species_property::id];
+
+      out[i][species_property::parent]     = L[j][species_property::parent];
+      out[i][species_property::birth_time] = L[j][species_property::birth_time];
+      out[i][species_property::id]         = L[j][species_property::id];
+
+      auto new_id = out[i][species_property::id];
+
+      for (size_t k = i; k < out.size(); ++k) {
+        if (out[k][species_property::parent] == old_id)
+          out[k][species_property::parent] = new_id;
+      }
+    } else {
+      --i;
+    }
+
+    sort_by_time(out);
   }
+
+  /*std::cerr << "\nltable looked up: \n";
+  for (const auto& i : out) {
+    for (const auto& j : i) {
+      std::cerr << j << " ";
+    } std::cerr << "\n";
+  }*/
+
+  out[0] = L[0];
+  out[1] = L[1]; // to avoid sorting effects
+
 
   // and now we need to renumber to ensure consistent numbering
   for (int i = 0; i < out.size(); ++i) {
     auto id = std::abs(out[i][species_property::id]);
+    auto old_id = out[i][species_property::id];
     if (id != (i + 1)) {
-      out[i][species_property::id] = out[i][species_property::id] < 0 ? -(i+1) : i+1;
+      int new_id = i + 1;
+      if (out[i][species_property::id] < 0) new_id *= -1;
+
+      out[i][species_property::id] = new_id;
+
       for (size_t j = i; j < out.size(); ++j) {
-        if (out[j][species_property::parent] == id) {
-          out[j][species_property::parent] = out[i][species_property::id];
+        if (out[j][species_property::parent] == old_id) {
+          out[j][species_property::parent] = new_id;
         }
       }
     }
   }
 
-  std::cerr << "\n";
-  std::cerr << "\n";
+ /* std::cerr << "\n";
+  std::cerr << "\nrenumbered: \n";
   for (const auto& i : out) {
     for (const auto& j : i) {
       std::cerr << j << " ";
     } std::cerr << "\n";
-  }
+  }*/
 
   return out;
 }
@@ -104,7 +137,7 @@ struct particle {
   double colless;
   int num_lin;
 
-  double weight;
+  double weight = 1.0;
   double sigma;
   ltable ltable_;
 
@@ -122,20 +155,22 @@ struct particle {
   }
 
   double prob_perturb(const particle& other) {
-    static double prefactor = -log(sigma) - 0.5 * log(2 * 3.141592653589793238);
-    double s = other.params_.size() * prefactor;
+    //static double prefactor = -log(sigma) - 0.5 * log(2 * 3.141592653589793238);
+    double s = 0.0; //other.params_.size() * prefactor;
 
     for (size_t i = 0; i < other.params_.size(); ++i) {
       double d = (params_[i] - other.params_[i]) * 1.0 / sigma;
       s += -0.5 * d * d;
     }
-    return exp(s);
+    double answ = std::exp(s);
+    return answ;
   }
 
   void update_weight(const std::vector<particle>& other) {
     weight = 0.0;
     for (const auto& i : other) {
-      weight += prob_perturb(i) * i.weight;
+      double prob = prob_perturb(i);
+      weight += prob * i.weight;
     }
   }
 
@@ -152,7 +187,7 @@ struct particle {
     bool crowns_alive = sim.L[0][species_property::death_time] < 0 &&
                         sim.L[1][species_property::death_time] < 0;
 
-    std::cerr << sim.status << " " << num_lin << " ";
+  //  std::cerr << sim.status << " " << num_lin << " ";
 
     if (sim.status == "success" &&
         num_lin >= min_lin &&
@@ -160,23 +195,23 @@ struct particle {
         crowns_alive) {
 
       ltable_ = drop_extinct(sim.L);
-      std::cerr << "ltable dropped ";
+    //  std::cerr << "ltable dropped ";
       // calc gamma and colless
 
 
       std::vector<double> brts = brts_from_ltable(ltable_);
       gamma = calc_gamma(brts);
-      std::cerr << "gamma calculated\n";
+     // std::cerr << "gamma calculated\n";
 
-      for (const auto& i : ltable_) {
+     /* for (const auto& i : ltable_) {
         for (const auto& j : i) {
           std::cerr << j << " ";
         } std::cerr << "\n";
-      }
+     }*/
 
       colless_stat_ltable s(ltable_);
       colless = static_cast<double>(s.colless());
-      std::cerr << "colless calculated ";
+     // std::cerr << "colless calculated ";
 
     } else {
       colless = 1e6;
@@ -237,18 +272,11 @@ struct analysis {
     if(updateFreq < 1) updateFreq = 1;
 
     int prev_print = 0;
-    std::cerr << "\n";
+
     while(current_sample.size() < num_particles) {
       auto new_particle = particle(rndgen_, sigma);
-      for (auto i : new_particle.params_) {
-        std::cerr << i << " ";
-      }
 
       new_particle.sim(crown_age, min_lin, max_lin);
-
-      std::cerr << new_particle.gamma << " " <<
-                   new_particle.colless << " " <<
-                   new_particle.num_lin << "\n";
 
       if (new_particle.num_lin >= min_lin &&
           new_particle.num_lin <= max_lin) {
@@ -261,6 +289,7 @@ struct analysis {
         prev_print = current_sample.size();
       }
     }
+    std::cerr << "\n";
   }
 
   void iterate(int iteration) {
@@ -296,6 +325,7 @@ struct analysis {
     }
 
     current_sample = new_sample;
+    std::cerr << "\n";
   }
 
 

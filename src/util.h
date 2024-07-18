@@ -29,11 +29,11 @@ inline void vector_to_numericmatrix(const std::vector< std::array< double, 4 >>&
 }
 
 inline void particle_to_numericmatrix(const std::vector< std::array<double, 10>>& v,
-                                    Rcpp::NumericMatrix& m) {
+                                      Rcpp::NumericMatrix& m) {
   int n_rows = v.size();
   m = Rcpp::NumericMatrix(n_rows, 10);
   for (int i = 0; i < n_rows; ++i) {
-    for (int j = 0; j < 4; ++j) {
+    for (int j = 0; j < 10; ++j) {
       m(i, j) = v[i][j];
     }
   }
