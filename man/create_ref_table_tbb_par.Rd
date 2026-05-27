@@ -4,7 +4,14 @@
 \alias{create_ref_table_tbb_par}
 \title{simulate many trees drawing from the prior}
 \usage{
-create_ref_table_tbb_par(num_repl, prior_means, crown_age, min_lin, max_lin)
+create_ref_table_tbb_par(
+  num_repl,
+  prior_means,
+  crown_age,
+  sd_crown_age,
+  min_lin,
+  max_lin
+)
 }
 \arguments{
 \item{num_repl}{a vector that indicates the time points of water level changes}

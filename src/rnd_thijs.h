@@ -44,6 +44,12 @@ struct rnd_t {
     return(d(rndgen_));
   }
 
+  double lognormal(double m, double s) {
+    std::lognormal_distribution<double> d(m, s);
+    return(d(rndgen_));
+  }
+
+
   double perturb_particle_val(double m) {
     return m + perturb(rndgen_);
   }

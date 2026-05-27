@@ -48,8 +48,8 @@ prior_dens_rcpp <- function(prior_means, x) {
 #' @return list with two entries: 1) list of newick strings, 2) matrix of
 #' used parameter values
 #' @export
-create_ref_table_tbb_par <- function(num_repl, prior_means, crown_age, min_lin, max_lin) {
-    .Call(`_physim_create_ref_table_tbb_par`, num_repl, prior_means, crown_age, min_lin, max_lin)
+create_ref_table_tbb_par <- function(num_repl, prior_means, crown_age, sd_crown_age, min_lin, max_lin) {
+    .Call(`_physim_create_ref_table_tbb_par`, num_repl, prior_means, crown_age, sd_crown_age, min_lin, max_lin)
 }
 
 #' simulate many trees drawing from the prior serially

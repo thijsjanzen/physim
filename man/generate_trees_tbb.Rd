@@ -10,6 +10,7 @@ generate_trees_tbb(
   min_tips = 50,
   max_tips = 150,
   crown_age = NULL,
+  sd_crown_age = NULL,
   file_name = "test.txt",
   num_threads = -1
 )
@@ -25,6 +26,9 @@ la_i, mu_g, mu_i, completion_rate)}
 \item{max_tips}{maximum number of tips (inclusive)}
 
 \item{crown_age}{crown age}
+
+\item{sd_crown_age}{if not NULL, crown ages are drawn randomly from a normal
+distribution with this standard deviation.}
 
 \item{file_name}{file name to write output to}
 

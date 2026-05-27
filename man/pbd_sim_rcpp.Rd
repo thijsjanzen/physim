@@ -4,7 +4,7 @@
 \alias{pbd_sim_rcpp}
 \title{Function to simulate the protracted speciation process}
 \usage{
-pbd_sim_rcpp(pars, age, upper_species_limit = 10000, num_tries = 100)
+pbd_sim_rcpp(pars, age, upper_species_limit = 1e+05, num_tries = 100)
 }
 \arguments{
 \item{pars}{Vector of parameters: \cr \cr \code{pars[1]} corresponds to b_1,

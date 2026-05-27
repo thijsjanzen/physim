@@ -71,17 +71,18 @@ BEGIN_RCPP
 END_RCPP
 }
 // create_ref_table_tbb_par
-Rcpp::List create_ref_table_tbb_par(int num_repl, std::vector<double> prior_means, double crown_age, int min_lin, int max_lin);
-RcppExport SEXP _physim_create_ref_table_tbb_par(SEXP num_replSEXP, SEXP prior_meansSEXP, SEXP crown_ageSEXP, SEXP min_linSEXP, SEXP max_linSEXP) {
+Rcpp::List create_ref_table_tbb_par(int num_repl, std::vector<double> prior_means, double crown_age, double sd_crown_age, int min_lin, int max_lin);
+RcppExport SEXP _physim_create_ref_table_tbb_par(SEXP num_replSEXP, SEXP prior_meansSEXP, SEXP crown_ageSEXP, SEXP sd_crown_ageSEXP, SEXP min_linSEXP, SEXP max_linSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< int >::type num_repl(num_replSEXP);
     Rcpp::traits::input_parameter< std::vector<double> >::type prior_means(prior_meansSEXP);
     Rcpp::traits::input_parameter< double >::type crown_age(crown_ageSEXP);
+    Rcpp::traits::input_parameter< double >::type sd_crown_age(sd_crown_ageSEXP);
     Rcpp::traits::input_parameter< int >::type min_lin(min_linSEXP);
     Rcpp::traits::input_parameter< int >::type max_lin(max_linSEXP);
-    rcpp_result_gen = Rcpp::wrap(create_ref_table_tbb_par(num_repl, prior_means, crown_age, min_lin, max_lin));
+    rcpp_result_gen = Rcpp::wrap(create_ref_table_tbb_par(num_repl, prior_means, crown_age, sd_crown_age, min_lin, max_lin));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -161,7 +162,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_physim_bisse_sim_cpp", (DL_FUNC) &_physim_bisse_sim_cpp, 7},
     {"_physim_draw_from_prior_rcpp", (DL_FUNC) &_physim_draw_from_prior_rcpp, 1},
     {"_physim_prior_dens_rcpp", (DL_FUNC) &_physim_prior_dens_rcpp, 2},
-    {"_physim_create_ref_table_tbb_par", (DL_FUNC) &_physim_create_ref_table_tbb_par, 5},
+    {"_physim_create_ref_table_tbb_par", (DL_FUNC) &_physim_create_ref_table_tbb_par, 6},
     {"_physim_create_ref_table_serial", (DL_FUNC) &_physim_create_ref_table_serial, 6},
     {"_physim_sim_ddd_cpp", (DL_FUNC) &_physim_sim_ddd_cpp, 7},
     {"_physim_sim_pbd_cpp", (DL_FUNC) &_physim_sim_pbd_cpp, 8},

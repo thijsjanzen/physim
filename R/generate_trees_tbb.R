@@ -5,6 +5,8 @@
 #' @param min_tips minimum number of tips (inclusive)
 #' @param max_tips maximum number of tips (inclusive)
 #' @param crown_age crown age
+#' @param sd_crown_age if not NULL, crown ages are drawn randomly from a normal
+#' distribution with this standard deviation.
 #' @param file_name file name to write output to
 #' @param num_threads number of threads
 #' @return a matrix with parameter values and the associated summary statistics
@@ -14,6 +16,7 @@ generate_trees_tbb <- function(number_of_trees = 1000,
                                min_tips = 50,
                                max_tips = 150,
                                crown_age = NULL,
+                               sd_crown_age = NULL,
                                file_name = "test.txt",
                                num_threads = -1) {
 
@@ -21,9 +24,13 @@ generate_trees_tbb <- function(number_of_trees = 1000,
     stop("Please either provide a reference tree, or provide the crown age")
   }
   RcppParallel::setThreadOptions(numThreads = num_threads)
+
+  if (is.null(sd_crown_age)) sd_crown_age = - 1
+
   sim_result <- physim::create_ref_table_tbb_par(num_repl = number_of_trees,
                                                  prior_means = prior_means,
                                                  crown_age = crown_age,
+                                                 sd_crown_age = sd_crown_age,
                                                  min_lin = min_tips,
                                                  max_lin = max_tips)
 
@@ -49,7 +56,7 @@ generate_trees_tbb <- function(number_of_trees = 1000,
                                  mc.cores = num_threads)
 
   stat_matrix <- matrix(unlist(stats, use.names = FALSE),
-                        ncol = 70,
+                        ncol = length(stats[[1]]),
                         byrow = TRUE)
 
   results <- cbind(sim_result$parameters, stat_matrix)

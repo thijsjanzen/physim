@@ -24,7 +24,7 @@ std::array<double, 5> draw_from_prior(rnd_t& rndgen,
                                       const std::vector<double>& prior_means) {
   std::array<double, 5> params;
   for (size_t i = 0; i < 5; ++i) {
-    params[i] = rndgen.exp(prior_means[i]);
+    params[i] = rndgen.exp(1.0 / prior_means[i]);
   } // order: la_0, la_1, mu_0, mu_1, comp_time
 
   return params;
@@ -41,7 +41,7 @@ std::vector<double> draw_from_prior_rcpp(const std::vector<double>& prior_means)
 
   std::vector<double> answ(5);
   for (size_t i = 0; i < 5; ++i) {
-    answ[i] = rndgen.exp(prior_means[i]);
+    answ[i] = rndgen.exp(1.0 / prior_means[i]);
   } // order: la_0, la_1, mu_0, mu_1, comp_time
 
   return answ;
@@ -74,6 +74,7 @@ double prior_dens_rcpp(const std::vector<double>& prior_means,
  Rcpp::List create_ref_table_tbb_par(int num_repl,
                                      std::vector<double> prior_means,
                                      double crown_age,
+                                     double sd_crown_age,
                                      int min_lin,
                                      int max_lin) {
 
@@ -94,6 +95,9 @@ double prior_dens_rcpp(const std::vector<double>& prior_means,
    if(updateFreq < 1) updateFreq = 1;
 
    int prev_update = 0;
+   double accept_rate = 1;
+   int num_accepted = 0;
+   int num_tried = 0;
 
    while(trees.size() < num_repl) {
      // yes, this is silly code. Thank you ;)
@@ -104,17 +108,21 @@ double prior_dens_rcpp(const std::vector<double>& prior_means,
      }
      prev_update = trees.size();
 
-
-
-
      // loop size can be optimized further, depending on the average success rate
      // e.g. loop_size = loop_size * 1.0f / success_rate
      // this is especially interesting once only a few are left.
      loop_size = num_repl - trees.size();
+     loop_size *= 1.0 / accept_rate;
+     loop_size = loop_size > 10000 ? 10000 : loop_size;
+
+     Rcpp::Rcout << "\nloop size: " << loop_size << " | accept rate: " << accept_rate << "\n";
+     Rcpp::Rcout << "num accepted: " << num_accepted << " | num tried: " << num_tried << "\n";
 
      std::vector< std::string > add(loop_size);
      std::vector< std::array<double, 5> > add_params(loop_size);
      std::vector< bool > add_flag(loop_size, false);
+
+     tbb::task_arena(num_threads).execute([&] {
 
      tbb::parallel_for(
        tbb::blocked_range<unsigned>(0, loop_size),
@@ -127,8 +135,16 @@ double prior_dens_rcpp(const std::vector<double>& prior_means,
          for (unsigned i = r.begin(); i < r.end(); ++i) {
            auto parameters = draw_from_prior(rndgen, prior_means);
 
+           double used_crown_age = crown_age;
+           if (sd_crown_age >= 0) {
+             used_crown_age = rndgen.lognormal(log(crown_age), sd_crown_age);
+             while(crown_age < 0) {
+               used_crown_age = rndgen.lognormal(log(crown_age), sd_crown_age);
+             }
+           }
+
            auto l_table = sim_once(parameters,
-                                   crown_age,
+                                   used_crown_age,
                                    max_lin * 10,
                                    &success,
                                    &num_lin);
@@ -141,21 +157,27 @@ double prior_dens_rcpp(const std::vector<double>& prior_means,
            }
          }
        });
+     });
+
 
      for(int j = 0; j < add_flag.size(); ++j) {
        if(add_flag[j]) {
          trees.push_back(add[j]);
          parameter_list.push_back(add_params[j]);
+         num_accepted++;
        }
      }
+     num_tried += loop_size;
+     accept_rate = static_cast<double>(num_accepted) / num_tried;
    }
 
-   Rcpp::List output(num_repl);
+   Rcpp::List output(trees.size());
    for(int k = 0; k < trees.size(); ++k) {
      output[k] = trees[k];
    }
 
-   Rcpp::NumericMatrix parameter_matrix(num_repl, 5);
+   Rcpp::NumericMatrix parameter_matrix(parameter_list.size(),
+                                        parameter_list[0].size());
    for(int k = 0; k < parameter_list.size(); ++k) {
      for(int j = 0; j < parameter_list[0].size(); ++j) {
        parameter_matrix(k, j) = parameter_list[k][j];
